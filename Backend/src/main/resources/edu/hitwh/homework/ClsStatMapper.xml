@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.hitwh.homework.mapper.ClsStatMapper">
+    <select id="listByCondition" resultType="edu.hitwh.homework.pojo.ClsStat">
+        SELECT * FROM class_statistics_view
+        <where>
+            <if test="className != null and className != ''">
+                AND class_name LIKE CONCAT('%', #{className}, '%')
+            </if>
+        </where>
+        ORDER BY class_name
+    </select>
+</mapper>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--文档声明-->
+
+<!--约束-->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.hitwh.homework.mapper.ClsMapper">
+    <select id="list" resultType="edu.hitwh.homework.pojo.Cls">
+        select * from cls
+        <where>
+            <if test="className != null and className != ''">
+                class_name like concat('%',#{className},'%')
+            </if>
+            <if test="begin != null and end != null">
+                and end between #{begin} and #{end}
+            </if>
+        </where>
+        order by update_time desc
+    </select>
+
+    <select id="insert">
+        insert into cls (class_name, begin, end, class_teacher_id, create_time, update_time
+        <if test="classRoom != null and classRoom != ''">
+            , class_room
+        </if>)
+        VALUES (#{className}, #{begin}, #{end}, #{classTeacherId}, #{createTime}, #{updateTime}
+        <if test="classRoom != null">
+            , #{classRoom}
+        </if>)
+    </select>
+
+    <select id="delete">
+        delete from cls where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getById">
+        SELECT *
+        FROM cls
+        WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        update cls
+        <set>
+            <if test="className != null and className != ''">
+                class_name = #{className},
+            </if>
+            <if test="classRoom != null and classRoom != ''">
+                class_room = #{classRoom},
+            </if>
+            <if test="begin != null">
+                begin = #{begin},
+            </if>
+            <if test="end != null">
+                end = #{end},
+            </if>
+            <if test="classTeacherId != null">
+                class_teacher_id = #{classTeacherId},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

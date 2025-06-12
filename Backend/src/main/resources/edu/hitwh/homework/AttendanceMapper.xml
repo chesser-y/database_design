@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.hitwh.homework.mapper.AttendanceMapper">
+    <!-- 条件分页查询 -->
+    <select id="list" resultType="edu.hitwh.homework.pojo.Attendance">
+        select a.*, stu.student_name as studentName, c.name as courseName
+        from attendance a
+        left join stu stu on a.student_id = stu.id
+        left join course c on a.course_id = c.id
+        <where>
+            <if test="studentId != null">
+                and a.student_id = #{studentId}
+            </if>
+            <if test="courseId != null">
+                and a.course_id = #{courseId}
+            </if>
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <!-- 新增考勤记录 -->
+    <insert id="insert">
+        insert into attendance (student_id, course_id, absence_count, create_time, update_time)
+        values (#{studentId}, #{courseId}, #{absenceCount}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- 批量删除考勤记录 -->
+    <delete id="delete">
+        delete from attendance where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据ID查询考勤记录 -->
+    <select id="getById" resultType="edu.hitwh.homework.pojo.Attendance">
+        SELECT *
+        FROM attendance
+        WHERE id = #{id}
+    </select>
+
+    <!-- 更新考勤信息 -->
+    <update id="update">
+        update attendance
+        <set>
+            <if test="studentId != null">
+                student_id = #{studentId},
+            </if>
+            <if test="courseId != null">
+                course_id = #{courseId},
+            </if>
+            <if test="absenceCount != null">
+                absence_count = #{absenceCount},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 批量导入考勤记录 -->
+    <insert id="batchImport">
+        insert into attendance (student_id, course_id, absence_count, create_time, update_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.studentId}, #{item.courseId}, #{item.absenceCount}, #{item.createTime}, #{item.updateTime})
+        </foreach>
+    </insert>
+</mapper>

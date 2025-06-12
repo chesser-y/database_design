@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.hitwh.homework.mapper.ScoreMapper">
+    <!-- 条件分页查询 -->
+    <select id="list" resultType="edu.hitwh.homework.pojo.Score">
+        select s.*, stu.student_name as studentName
+        from score s
+        left join stu stu on s.student_id = stu.id
+        <where>
+            <if test="studentId != null">
+                and s.student_id = #{studentId}
+            </if>
+            <if test="courseId != null">
+                and s.course_id = #{courseId}
+            </if>
+            <if test="examTime != null">
+                and s.exam_time = #{examTime}
+            </if>
+        </where>
+        order by s.update_time desc
+    </select>
+
+    <!-- 新增成绩 -->
+    <insert id="insert">
+        insert into score (student_id, course_id, score, exam_time, create_time, update_time)
+        values (#{studentId}, #{courseId}, #{score}, #{examTime}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- 批量删除成绩 -->
+    <delete id="delete">
+        delete from score where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据ID查询成绩 -->
+    <select id="getById" resultType="edu.hitwh.homework.pojo.Score">
+        SELECT *
+        FROM score
+        WHERE id = #{id}
+    </select>
+
+    <!-- 更新成绩信息 -->
+    <update id="update">
+        update score
+        <set>
+            <if test="studentId != null">
+                student_id = #{studentId},
+            </if>
+            <if test="courseId != null">
+                course_id = #{courseId},
+            </if>
+            <if test="score != null">
+                score = #{score},
+            </if>
+            <if test="examTime != null">
+                exam_time = #{examTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 批量导入成绩 -->
+    <insert id="batchImport">
+        insert into score (student_id, course_id, score, exam_time, create_time, update_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.studentId}, #{item.courseId}, #{item.score}, #{item.examTime}, #{item.createTime}, #{item.updateTime})
+        </foreach>
+    </insert>
+</mapper>

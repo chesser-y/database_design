@@ -1,0 +1,6 @@
+aliyun:
+  oss:
+    endpoint: https://oss-cn-hangzhou.aliyuncs.com
+    accessKeyId: gXoLTAI5tNJBFWmsEAoqdR59Kt3
+    accessKeySecret: F841Oice9G5IbiZR7Fmo4ltZV4Y
+    bucketName: web-homework5089

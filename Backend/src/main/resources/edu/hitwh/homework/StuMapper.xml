@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--文档声明-->
+<!--约束-->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.hitwh.homework.mapper.StuMapper">
+
+    <!-- 查询学员列表 -->
+    <select id="list" resultType="edu.hitwh.homework.pojo.Stu">
+        select * from stu
+        <where>
+            <if test="studentName != null and studentName != ''">
+                student_name like concat('%', #{studentName}, '%')
+            </if>
+            <if test="studentNo != null and studentNo != ''">
+                AND student_no like concat('%', #{studentNo}, '%')
+            </if>
+            <if test="highestEducation != null and highestEducation != ''">
+                AND highest_education = #{highestEducation}
+            </if>
+            <if test="className != null and className != ''">
+                AND class_name = #{className}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <!-- 插入学员 -->
+    <insert id="insert">
+        insert into stu (student_name, student_no, gender, phone, highest_education, class_name, create_time, update_time, discipline_count, penalty_score)
+        values (#{studentName}, #{studentNo}, #{gender}, #{phone}, #{highestEducation}, #{className}, #{createTime}, #{updateTime}, #{disciplineCount}, #{penaltyScore})
+    </insert>
+
+    <!-- 删除学员 -->
+    <delete id="delete">
+        delete from stu where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据 id 查询学员 -->
+    <select id="getById" resultType="edu.hitwh.homework.pojo.Stu">
+        select * from stu where id = #{id}
+    </select>
+
+    <!-- 更新学员信息 -->
+    <update id="update">
+        update stu
+        <set>
+            <if test="studentName != null and studentName != ''">
+                student_name = #{studentName},
+            </if>
+            <if test="studentNo != null and studentNo != ''">
+                student_no = #{studentNo},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="highestEducation != null and highestEducation != ''">
+                highest_education = #{highestEducation},
+            </if>
+            <if test="className != null and className != ''">
+                class_name = #{className},
+            </if>
+            <if test="disciplineCount != null">
+                discipline_count = #{disciplineCount},
+            </if>
+            <if test="penaltyScore != null">
+                penalty_score = #{penaltyScore},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 更新学员违纪信息 -->
+    <update id="handleDiscipline">
+        update stu
+        set discipline_count = #{disciplineCount}, penalty_score = #{penaltyScore}
+        where id = #{id}
+    </update>
+
+</mapper>
