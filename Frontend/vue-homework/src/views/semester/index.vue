@@ -1,17 +1,11 @@
 <template>
   <div class="app-container">
     <!-- 搜索表单 -->
-    <el-form :inline="true" :model="searchAttendance" class="demo-form-inline">
-      <el-form-item label="学生ID">
+    <el-form :inline="true" :model="searchSemester" class="demo-form-inline">
+      <el-form-item label="学期名称">
         <el-input
-          v-model="searchAttendance.studentId"
-          placeholder="请输入学生ID"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="课程ID">
-        <el-input
-          v-model="searchAttendance.courseId"
-          placeholder="请输入课程ID"
+          v-model="searchSemester.name"
+          placeholder="请输入学期名称"
         ></el-input>
       </el-form-item>
       <el-form-item>
@@ -23,20 +17,40 @@
     <!-- 按钮 -->
     <el-row>
       <el-button type="danger" size="medium" @click="deleteByIds">- 批量删除</el-button>
-      <el-button type="primary" size="medium" @click="dialogVisible = true; attendance = {};">+ 新增考勤记录</el-button>
+      <el-button type="primary" size="medium" @click="dialogVisible = true; semester = {};">+ 新增学期</el-button>
     </el-row>
 
     <!-- 添加数据对话框表单 -->
-    <el-dialog ref="form" title="编辑考勤记录" :visible.sync="dialogVisible" width="30%">
-      <el-form ref="form" :model="attendance" label-width="80px" size="mini">
-        <el-form-item label="* 学生ID">
-          <el-input v-model="attendance.studentId" placeholder="请输入学生ID"></el-input>
+    <el-dialog ref="form" title="编辑学期" :visible.sync="dialogVisible" width="30%">
+      <el-form ref="form" :model="semester" label-width="80px" size="mini">
+        <el-form-item label="学期名称">
+          <el-input v-model="semester.name" placeholder="请输入学期名称"></el-input>
         </el-form-item>
-        <el-form-item label="* 课程ID">
-          <el-input v-model="attendance.courseId" placeholder="请输入课程ID"></el-input>
+        <el-form-item label="开始时间">
+          <el-date-picker
+            v-model="semester.beginTime"
+            clearable
+            type="date"
+            placeholder="请选择开始时间"
+            size="small"
+            style="width:100%"
+          ></el-date-picker>
         </el-form-item>
-        <el-form-item label="* 缺勤次数">
-          <el-input v-model="attendance.absenceCount" placeholder="请输入缺勤次数"></el-input>
+        <el-form-item label="结束时间">
+          <el-date-picker
+            v-model="semester.endTime"
+            clearable
+            type="date"
+            placeholder="请选择结束时间"
+            size="small"
+            style="width:100%"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item label="学年">
+          <el-input v-model="semester.academicYear" placeholder="请输入学年"></el-input>
+        </el-form-item>
+        <el-form-item label="学期号">
+          <el-input v-model="semester.termNumber" placeholder="请输入学期号"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="add">提交</el-button>
@@ -50,12 +64,11 @@
     <template>
       <el-table :data="tableData" style="width: 100%" border @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
-        <!-- <el-table-column prop="studentId" label="学生ID" align="center"></el-table-column> -->
-        
-        <el-table-column prop="studentId" label="学生姓名" align="center" :formatter="formatStudentName"></el-table-column>
-        <!-- <el-table-column prop="courseId" label="课程ID" align="center"></el-table-column> -->
-        <el-table-column prop="courseId"  label="课程"  align="center" :formatter="formatCourseName"></el-table-column>
-        <el-table-column prop="absenceCount" label="缺勤次数" align="center"></el-table-column>
+        <el-table-column prop="name" label="学期名称" align="center"></el-table-column>
+        <el-table-column prop="beginTime" label="开始时间" align="center"></el-table-column>
+        <el-table-column prop="endTime" label="结束时间" align="center"></el-table-column>
+        <el-table-column prop="academicYear" label="学年" align="center"></el-table-column>
+        <el-table-column prop="termNumber" label="学期号" align="center"></el-table-column>
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
             <el-button type="primary" size="small" @click="update(scope.row.id)">编辑</el-button>
@@ -81,10 +94,7 @@
 </template>
 
 <script>
-import { page, add, update, deleteById, selectById } from "@/api/attendance.js";
-import { findAllStudents } from "@/api/stu.js"; // 新增：获取学生列表
-import { findAllCourses } from "@/api/course.js"; // 新增：获取课程列表
-import { getToken } from "@/utils/auth";
+import { page, add, update, deleteById, selectById } from "@/api/semester.js";
 
 export default {
   data() {
@@ -98,44 +108,30 @@ export default {
       currentPage: 1,
       // 添加数据对话框是否展示的标记
       dialogVisible: false,
-      // 考勤模型数据
-      searchAttendance: {
-        studentId: "",
-        courseId: ""
+      // 搜索表单数据
+      searchSemester: {
+        name: "",
       },
-      attendanceList: [],
-      attendance: {},
+      // 学期数据
+      semester: {},
       // 被选中的id数组
       selectedIds: [],
-      studentList: [],
-      courseList: [],
       // 复选框选中数据集合
       multipleSelection: [],
       // 表格数据
       tableData: [],
-      token: { token: getToken() }
     };
   },
 
   mounted() {
-    this.page();
-    // 加载学生和课程列表
-    findAllStudents()
-      .then((res) => {
-        this.studentList = res.data.data;
-        // console.log('学生列表数据:', this.studentList);
-      });
-    findAllCourses().then((res) => {
-      this.courseList = res.data.data;
-    });
+    this.page(); // 当页面加载完成后，发送异步请求，获取数据
   },
 
   methods: {
     // 查询分页数据
     page() {
       page(
-        this.searchAttendance.studentId,
-        this.searchAttendance.courseId,
+        this.searchSemester.name,
         this.currentPage,
         this.pageSize
       ).then((res) => {
@@ -156,18 +152,19 @@ export default {
     },
 
     clear() {
-      this.searchAttendance = { studentId: "", courseId: "" };
+      this.searchSemester = { name: "" };
       this.page();
     },
+
     // 添加数据
     add() {
       let operator;
 
-      if (this.attendance.id) {
+      if (this.semester.id) {
         // 修改
-        operator = update(this.attendance);
+        operator = update(this.semester);
       } else {
-        operator = add(this.attendance);
+        operator = add(this.semester);
       }
 
       operator.then((resp) => {
@@ -175,34 +172,24 @@ export default {
           this.dialogVisible = false;
           this.page();
           this.$message({ message: "恭喜你，保存成功", type: "success" });
-          this.attendance = {};
+          this.semester = {};
         } else {
           this.$message.error(resp.data.msg);
         }
       });
     },
+
     update(id) {
       // 1. 打开窗口
       this.dialogVisible = true;
       // 2. 发送请求
-
       selectById(id).then((result) => {
         if (result.data.code == 1) {
-          this.attendance = result.data.data;
-          this.attendance;
+          this.semester = result.data.data;
         }
       });
     },
-    formatStudentName(row) {
-      const student = this.studentList.find((c) => c.id === row.studentId);
-      return student ? student.studentName : "未知";
-    },
 
-    // 新增：格式化课程ID为课程名称
-    formatCourseName(row) {
-      const course = this.courseList.find((c) => c.id === row.courseId);
-      return course ? course.name : "未知";
-    },
     // 分页
     handleSizeChange(val) {
       // 重新设置每页显示的条数
@@ -216,12 +203,12 @@ export default {
       this.page();
     },
 
-    // 删除考勤记录
+    // 删除学期信息
     deleteById(id) {
       this.$confirm("此操作将删除该数据, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       }).then(() => {
         // 2. 发送AJAX请求
         deleteById(id).then((resp) => {
@@ -239,13 +226,13 @@ export default {
       });
     },
 
-    // 批量删除考勤记录
+    // 批量删除学期信息
     deleteByIds() {
       // 弹出确认提示框
       this.$confirm("此操作将删除该数据, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       }).then(() => {
         // 用户点击确认按钮
         // 1. 创建id数组, 从 this.multipleSelection 获取即可
@@ -267,33 +254,120 @@ export default {
         // 用户点击取消按钮
         this.$message.info("已取消删除");
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style>
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
+
+<style lang="scss">
+/* 修复input 背景不协调 和光标变色 */
+/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
+
+$bg:#283443;
+$light_gray:#fff;
+$cursor: #fff;
+
+@supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
+  .login-container .el-input input {
+    color: $cursor;
+  }
+}
+
+/* reset element-ui css */
+.login-container {
+  .el-input {
+    display: inline-block;
+    height: 47px;
+    width: 85%;
+
+    input {
+      background: transparent;
+      border: 0px;
+      -webkit-appearance: none;
+      border-radius: 0px;
+      padding: 12px 5px 12px 15px;
+      color: $light_gray;
+      height: 47px;
+      caret-color: $cursor;
+
+      &:-webkit-autofill {
+        box-shadow: 0 0 0px 1000px $bg inset !important;
+        -webkit-text-fill-color: $cursor !important;
+      }
+    }
+  }
+
+  .el-form-item {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    color: #454545;
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+$bg:#2d3a4b;
+$dark_gray:#889aa4;
+$light_gray:#eee;
+
+.login-container {
+  min-height: 100%;
+  width: 100%;
+  background-color: $bg;
   overflow: hidden;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 100px;
-  height: 100px;
-  line-height: 100px;
-  text-align: center;
-}
-.avatar {
-  width: 100px;
-  height: 100px;
-  display: block;
+
+  .login-form {
+    position: relative;
+    width: 520px;
+    max-width: 100%;
+    padding: 160px 35px 0;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .tips {
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 10px;
+
+    span {
+      &:first-of-type {
+        margin-right: 16px;
+      }
+    }
+  }
+
+  .svg-container {
+    padding: 6px 5px 6px 15px;
+    color: $dark_gray;
+    vertical-align: middle;
+    width: 30px;
+    display: inline-block;
+  }
+
+  .title-container {
+    position: relative;
+
+    .title {
+      font-size: 26px;
+      color: $light_gray;
+      margin: 0px auto 40px auto;
+      text-align: center;
+      font-weight: bold;
+      font-family: '楷体';
+    }
+  }
+
+  .show-pwd {
+    position: absolute;
+    right: 10px;
+    top: 7px;
+    font-size: 16px;
+    color: $dark_gray;
+    cursor: pointer;
+    user-select: none;
+  }
 }
 </style>

@@ -97,6 +97,18 @@ export const constantRoutes = [
         name: 'Score',
         component: () => import('@/views/score'),
         meta: { title: '学生成绩管理', icon: 'el-icon-menu' }
+      },
+      {
+        path: 'material',
+        name: 'Material',
+        component: () => import('@/views/material'),
+        meta: { title: '课程教材管理', icon: 'el-icon-menu' }
+      },
+      {
+        path: 'semester',
+        name: 'Semester',
+        component: () => import('@/views/semester'),
+        meta: { title: '学期规划管理', icon: 'el-icon-s-data' }
       }
     ]
   },
@@ -122,29 +134,6 @@ export const constantRoutes = [
       }
     ]
   },
- 
-  // {
-  //   path: '/report',
-  //   component: Layout,
-  //   redirect: '/report',
-  //   name: 'Report',
-  //   meta: { title: '数据统计管理', icon: 'el-icon-s-tools' },
-  //   children: [
-  //     {
-  //       path: 'emp-report',
-  //       name: 'emp-report',
-  //       component: () => import('@/views/emp-report'),
-  //       meta: { title: '员工信息统计', icon: 'el-icon-s-data' }
-  //     },
-  //     {
-  //       path: 'student-report',
-  //       name: 'student-report',
-  //       component: () => import('@/views/student-report'),
-  //       meta: { title: '学员信息统计', icon: 'el-icon-s-data' }
-  //     }
-  //   ]
-  // },
-
  
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
