@@ -73,28 +73,77 @@ export const constantRoutes = [
     ]
   },
 
- 
   {
-    path: '/report',
+    path: '/course-info',
     component: Layout,
-    redirect: '/report',
-    name: 'Report',
-    meta: { title: '数据统计管理', icon: 'el-icon-s-tools' },
+    redirect: '/course-info',
+    name: 'CourseInfo',
+    meta: { title: '课程信息管理', icon: 'el-icon-s-tools' },
     children: [
       {
-        path: 'emp-report',
-        name: 'emp-report',
-        component: () => import('@/views/emp-report'),
-        meta: { title: '员工信息统计', icon: 'el-icon-s-data' }
+        path: 'course',
+        name: 'Course',
+        component: () => import('@/views/course'),
+        meta: { title: '教师任课管理', icon: 'el-icon-menu' }
       },
       {
-        path: 'student-report',
-        name: 'student-report',
-        component: () => import('@/views/student-report'),
-        meta: { title: '学员信息统计', icon: 'el-icon-s-data' }
+        path: 'attendance',
+        name: 'Attendance',
+        component: () => import('@/views/attendance'),
+        meta: { title: '学生考勤管理', icon: 'el-icon-menu' }
+      },
+      {
+        path: 'score',
+        name: 'Score',
+        component: () => import('@/views/score'),
+        meta: { title: '学生成绩管理', icon: 'el-icon-menu' }
       }
     ]
   },
+
+  {
+    path: '/stat-info',
+    component: Layout,
+    redirect: '/stat-info',
+    name: 'StatInfo',
+    meta: { title: '统计信息管理', icon: 'el-icon-s-tools' },
+    children: [
+      {
+        path: 'cls-stat',
+        name: 'ClassStat',
+        component: () => import('@/views/cls-stat'),
+        meta: { title: '班级信息统计', icon: 'el-icon-s-data' }
+      },
+      {
+        path: 'course-score-stat',
+        name: 'CourseScoreStat',
+        component: () => import('@/views/course-score-stat'),
+        meta: { title: '课程成绩统计', icon: 'el-icon-s-data' }
+      }
+    ]
+  },
+ 
+  // {
+  //   path: '/report',
+  //   component: Layout,
+  //   redirect: '/report',
+  //   name: 'Report',
+  //   meta: { title: '数据统计管理', icon: 'el-icon-s-tools' },
+  //   children: [
+  //     {
+  //       path: 'emp-report',
+  //       name: 'emp-report',
+  //       component: () => import('@/views/emp-report'),
+  //       meta: { title: '员工信息统计', icon: 'el-icon-s-data' }
+  //     },
+  //     {
+  //       path: 'student-report',
+  //       name: 'student-report',
+  //       component: () => import('@/views/student-report'),
+  //       meta: { title: '学员信息统计', icon: 'el-icon-s-data' }
+  //     }
+  //   ]
+  // },
 
  
   // 404 page must be placed at the end !!!

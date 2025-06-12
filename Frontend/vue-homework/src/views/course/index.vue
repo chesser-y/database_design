@@ -1,113 +1,90 @@
 <template>
   <div class="app-container">
-    <!--搜索表单-->
-    <el-form :inline="true" :model="searchCls" class="demo-form-inline">
-      <el-form-item label="班级名称">
+    <!-- 搜索表单 -->
+    <el-form :inline="true" :model="searchCourse" class="demo-form-inline">
+      <el-form-item label="课程名称">
         <el-input
-          v-model="searchCls.className"
-          placeholder="请输入班级名称"
+          v-model="searchCourse.name"
+          placeholder="请输入课程名称"
         ></el-input>
       </el-form-item>
-
-      <!-- <el-form-item label="班级教室">
-        <el-input v-model="searchCls.classRoom" placeholder="请输入班级教室">
-        </el-input>
-      </el-form-item> -->
-
+      <el-form-item label="教师ID">
+        <el-input
+          v-model="searchCourse.teacherId"
+          placeholder="请输入教师ID"
+        ></el-input>
+      </el-form-item>
       <el-form-item label="结课时间">
         <el-date-picker
           v-model="endDate"
           clearable
           value-format="yyyy-MM-dd"
           type="daterange"
-          placeholder="选择日期"
+          placeholder="选择日期范围"
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
           style="width: 400px; margin-left: 20px"
         ></el-date-picker>
       </el-form-item>
-
       <el-form-item>
         <el-button type="primary" @click="onSubmit">查询</el-button>
-         <el-button type="info" @click="clear">清空</el-button>
+        <el-button type="info" @click="clear">清空</el-button>
       </el-form-item>
     </el-form>
-    
-    <!--按钮-->
+
+    <!-- 按钮 -->
     <el-row>
       <el-button type="danger" size="medium" @click="deleteByIds">- 批量删除</el-button>
-      <el-button type="primary" size="medium" @click="dialogVisible = true; cls = {};" >+ 新增班级</el-button>
+      <el-button type="primary" size="medium" @click="dialogVisible = true; course = {};">+ 新增课程</el-button>
     </el-row>
 
-    <!--添加数据对话框表单-->
-    <el-dialog ref="form" title="编辑班级" :visible.sync="dialogVisible" width="30%">
-      <el-form ref="form" :model="cls" label-width="80px" size="mini">
-        <el-form-item label="* 班级名称" >
-          <el-input v-model="cls.className"  placeholder="请输入班级名称，如：2024第01期10班"></el-input>
+    <!-- 添加数据对话框表单 -->
+    <el-dialog ref="form" title="编辑课程" :visible.sync="dialogVisible" width="30%">
+      <el-form ref="form" :model="course" label-width="80px" size="mini">
+        <el-form-item label="* 课程名称">
+          <el-input v-model="course.name" placeholder="请输入课程名称"></el-input>
         </el-form-item>
-        <el-form-item label="班级教室">
-          <el-input v-model="cls.classRoom"  placeholder="请填写班级教室"></el-input>
-        </el-form-item>
-
-
-        <el-form-item label="* 开课时间" >
+        <el-form-item label="* 开始日期">
           <el-date-picker
-            v-model="cls.begin"
+            v-model="course.begin"
             clearable
             type="date"
-            placeholder="请选择开课时间"
+            placeholder="请选择开始日期"
             size="small"
             style="width:100%"
           ></el-date-picker>
         </el-form-item>
-        
-        <el-form-item label="* 结课时间">
+        <el-form-item label="* 结束日期">
           <el-date-picker
-            v-model="cls.end"
+            v-model="course.end"
             clearable
             type="date"
-            placeholder="请选择结课时间"
+            placeholder="请选择结束日期"
             size="small"
             style="width:100%"
           ></el-date-picker>
         </el-form-item>
-
-        <el-form-item label="* 班主任">
-          <el-select v-model="cls.classTeacherId" placeholder="请选择" style="width:100%">
-            
-            <!-- <el-option label="金庸" value="1"></el-option>
-            <el-option label="东方不败" value="2"></el-option> -->
-            
-            <el-option
-              v-for="item in empList"
-              :key="item.value"
-              :label="item.name"
-              :value="item.id"
-            />
-          </el-select>
+        <el-form-item label="* 教师ID">
+          <el-input v-model="course.teacherId" placeholder="请输入教师ID"></el-input>
         </el-form-item>
-
         <el-form-item>
           <el-button type="primary" @click="add">提交</el-button>
           <el-button @click="dialogVisible = false">取消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
-    
+
     <br>
-    <!--表格-->
+    <!-- 表格 -->
     <template>
       <el-table :data="tableData" style="width: 100%" border @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55"  align="center"></el-table-column>
-        <el-table-column  prop="className"  label="班级名称"  align="center"></el-table-column>
-        <el-table-column prop="classRoom" label="班级教室" align="center"></el-table-column>
-        <el-table-column prop="begin" label="开课时间" align="center"></el-table-column>
-        <el-table-column prop="end" label="结课时间" align="center"></el-table-column>
-        <el-table-column prop="classTeacherId" label="班主任" align="center" :formatter="formatTeacherName"></el-table-column>
-
-
-        
+        <el-table-column type="selection" width="55" align="center"></el-table-column>
+        <el-table-column prop="name" label="课程名称" align="center"></el-table-column>
+        <!-- <el-table-column prop="teacherId" label="教师ID" align="center"></el-table-column> -->
+        <el-table-column prop="teacherId" label="教师姓名" align="center" :formatter="formatTeacherName"></el-table-column>
+        <el-table-column prop="beginTime" label="开始日期" align="center"></el-table-column>
+        <el-table-column prop="endTime" label="结束日期" align="center"></el-table-column>
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
             <el-button type="primary" size="small" @click="update(scope.row.id)">编辑</el-button>
@@ -117,7 +94,7 @@
       </el-table>
     </template>
 
-    <!--分页工具条-->
+    <!-- 分页工具条 -->
     <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -126,18 +103,16 @@
       :page-sizes="[5, 10, 15, 20]"
       :page-size="5"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="totalCount">
+      :total="totalCount"
+    >
     </el-pagination>
   </div>
 </template>
 
-
-
-
 <script>
-import { page, add, update, deleteById, selectById } from "@/api/cls.js";
-import { findAll } from "@/api/emp.js";
-import { getToken } from '@/utils/auth';
+import { page, add, update, deleteById, selectById, listAll } from "@/api/course.js";
+import { getToken } from "@/utils/auth";
+import {findAll} from "@/api/emp.js";
 
 export default {
   data() {
@@ -151,13 +126,14 @@ export default {
       currentPage: 1,
       // 添加数据对话框是否展示的标记
       dialogVisible: false,
-      // 班级模型数据
-      searchCls: {
-        className: "",
+      // 课程模型数据
+      searchCourse: {
+        name: "",
+        teacherId: ""
       },
+      courseList: [],
       empList: [],
-      clsList: [],
-      cls:{},
+      course: {},
       beginTime: "",
       endTime: "",
       endDate: "",
@@ -167,22 +143,23 @@ export default {
       multipleSelection: [],
       // 表格数据
       tableData: [],
-      token: {token: getToken()}
+      token: { token: getToken() }
     };
   },
 
   mounted() {
-    this.page(); //当页面加载完成后，发送异步请求，获取数据
+    this.page(); // 当页面加载完成后，发送异步请求，获取数据
     findAll().then((result) => {
       this.empList = result.data.data;
     });
   },
-  
+
   methods: {
     // 查询分页数据
     page() {
       page(
-        this.searchCls.className,
+        this.searchCourse.name,
+        this.searchCourse.teacherId,
         this.beginTime,
         this.endTime,
         this.currentPage,
@@ -191,10 +168,6 @@ export default {
         this.totalCount = res.data.data.total;
         this.tableData = res.data.data.rows;
       });
-    },
-    formatTeacherName(row) {
-      const teacher = this.empList.find(emp => emp.id === row.classTeacherId);
-      return teacher ? teacher.name : '未知';
     },
 
     // 复选框选中后执行的方法
@@ -208,22 +181,23 @@ export default {
       this.page();
     },
 
-    clear(){
-      this.searchCls = {className: "", classRoom: "", classTeacherId:""};
-      this.beginTime = "",
-      this.endTime = "",
+    clear() {
+      this.searchCourse = { name: "", teacherId: "" };
+      this.beginTime = "";
+      this.endTime = "";
       this.endDate = "";
       this.page();
     },
+
     // 添加数据
     add() {
       let operator;
 
-      if (this.cls.id) {
-        //修改
-        operator = update(this.cls);
+      if (this.course.id) {
+        // 修改
+        operator = update(this.course);
       } else {
-        operator = add(this.cls);
+        operator = add(this.course);
       }
 
       operator.then((resp) => {
@@ -231,27 +205,32 @@ export default {
           this.dialogVisible = false;
           this.page();
           this.$message({ message: "恭喜你，保存成功", type: "success" });
-          this.cls = {};
+          this.course = {};
         } else {
           this.$message.error(resp.data.msg);
         }
       });
     },
+
     update(id) {
-      //1. 打开窗口
+      // 1. 打开窗口
       this.dialogVisible = true;
-      //2. 发送请求
+      // 2. 发送请求
 
       selectById(id).then((result) => {
         if (result.data.code == 1) {
-          this.cls = result.data.data;
-          this.cls;
+          this.course = result.data.data;
+          this.course;
         }
       });
     },
 
-    
-    //分页
+    formatTeacherName(row) {
+      const teacher = this.empList.find(emp => emp.id === row.teacherId);
+      return teacher ? teacher.name : '未知';
+    },
+
+    // 分页
     handleSizeChange(val) {
       // 重新设置每页显示的条数
       this.pageSize = val;
@@ -264,64 +243,59 @@ export default {
       this.page();
     },
 
-
-    //删除班级信息
-    deleteById(id){
+    // 删除课程
+    deleteById(id) {
       this.$confirm("此操作将删除该数据, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning",
+        type: "warning"
       }).then(() => {
-          //2. 发送AJAX请求
-          deleteById(id).then((resp) => {
-            if (resp.data.code == 1) {
-              //删除成功
-              this.$message.success("恭喜你，删除成功");
-              this.page();
-            } else {
-              this.$message.error(resp.data.msg);
-            }
-          });
-      }).catch(() => {
-          //用户点击取消按钮
-          this.$message.info("已取消删除");
+        // 2. 发送AJAX请求
+        deleteById(id).then((resp) => {
+          if (resp.data.code == 1) {
+            // 删除成功
+            this.$message.success("恭喜你，删除成功");
+            this.page();
+          } else {
+            this.$message.error(resp.data.msg);
+          }
         });
+      }).catch(() => {
+        // 用户点击取消按钮
+        this.$message.info("已取消删除");
+      });
     },
 
-
-    // 批量删除班级信息
+    // 批量删除课程
     deleteByIds() {
       // 弹出确认提示框
       this.$confirm("此操作将删除该数据, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning",
+        type: "warning"
       }).then(() => {
-          //用户点击确认按钮
-          //1. 创建id数组, 从 this.multipleSelection 获取即可
-          for (let i = 0; i < this.multipleSelection.length; i++) {
-            this.selectedIds[i] = this.multipleSelection[i].id;
+        // 用户点击确认按钮
+        // 1. 创建id数组, 从 this.multipleSelection 获取即可
+        for (let i = 0; i < this.multipleSelection.length; i++) {
+          this.selectedIds[i] = this.multipleSelection[i].id;
+        }
+
+        // 2. 发送AJAX请求
+        deleteById(this.selectedIds).then((resp) => {
+          if (resp.data.code == "1") {
+            // 删除成功
+            this.$message.success("恭喜你，删除成功");
+            this.page();
+          } else {
+            this.$message.error(resp.data.msg);
           }
-
-          //2. 发送AJAX请求
-          deleteById(this.selectedIds).then((resp) => {
-            if (resp.data.code == "1") {
-              //删除成功
-              this.$message.success("恭喜你，删除成功");
-              this.page();
-            } else {
-              this.$message.error(resp.data.msg);
-            }
-          });
-      }).catch(() => {
-          //用户点击取消按钮
-          this.$message.info("已取消删除");
         });
-    },
-
-
+      }).catch(() => {
+        // 用户点击取消按钮
+        this.$message.info("已取消删除");
+      });
+    }
   },
-
 
   watch: {
     endDate(val) {
@@ -332,10 +306,11 @@ export default {
         this.beginTime = "";
         this.endTime = "";
       }
-    },
-  },
+    }
+  }
 };
 </script>
+
 <style>
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;

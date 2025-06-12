@@ -16,6 +16,13 @@ export function add(stu) {
   })
 }
 
+export function findAllStudents() {
+  return request({
+    url: '/stu/all',
+    method: 'get',
+  })
+}
+
 export function update(stu) {
   return request({
     url: '/stu',

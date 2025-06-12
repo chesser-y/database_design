@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.hitwh.homework.mapper.MaterialMapper">
+    <select id="list" resultType="edu.hitwh.homework.pojo.Material">
+        select * from material
+        <where>
+            <if test="name != null and name != ''">
+                name like concat('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+<!--    useGeneratedKeys="true" 让 MyBatis 拿到数据库自动生成的主键-->
+<!--    keyProperty="id" 指定把主键赋值给实体类的哪个字段。-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into material (name, author, publisher, edition)
+        VALUES (#{name}, #{author}, #{publisher}, #{edition})
+    </insert>
+
+    <delete id="delete">
+        delete from material where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getById" resultType="edu.hitwh.homework.pojo.Material">
+        SELECT *
+        FROM material
+        WHERE id = #{id}
+    </select>
+
+    <select id="listByCourseName" resultType="edu.hitwh.homework.pojo.Material">
+        SELECT m.*
+        FROM material m
+                 JOIN usage_material ci ON m.id = ci.material_id
+                 JOIN course c ON ci.course_id = c.id
+        WHERE c.name = #{courseName}
+    </select>
+
+    <update id="update">
+        update material
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="author != null and author != ''">
+                author = #{author},
+            </if>
+            <if test="publisher != null and publisher != ''">
+                publisher = #{publisher},
+            </if>
+            <if test="edition != null and edition != ''">
+                edition = #{edition},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteAllCourseMappings">
+        DELETE FROM usage_material WHERE material_id = #{materialId}
+    </delete>
+
+    <insert id="insertCourseMapping">
+        INSERT INTO usage_material (material_id, course_id)
+        VALUES (#{materialId}, #{courseId})
+    </insert>
+</mapper>
